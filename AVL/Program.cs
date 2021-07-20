@@ -1,24 +1,26 @@
-﻿using System;
-
+﻿//Here you can watch it int real life https://visualgo.net/en/bst
+using System;
 namespace AVL {
     class Program {
         static void Main(string[] args) {
             var tree = new AVLTree();
-            tree.Add(5);
-            tree.Add(2);
-            tree.Add(3);
-            tree.Add(1);
-            //tree.Add(4);
-            //tree.Add(10);
+
+            tree.Add(15);
+            tree.Add(10);
+            tree.Add(11);
+            tree.Add(23);
+            tree.Add(56);
+            tree.Add(33);
+            tree.Add(30);
+           
 
 
-
-            tree.Print();
-            // Console.WriteLine(tree.Root.Right.Right.Data);
+            tree.PrePrint();
         }
     }
+
     class Node {
-        public Node(int data, Node left = null, Node right = null, int height = 0) {
+        public Node(int data, Node left = null, Node right = null, int height = 1) {
             Data = data;
             Left = left;
             Right = right;
@@ -37,6 +39,7 @@ namespace AVL {
         public Node Root { get; set; } = null;
 
         public void Add(int data) => Root = Add(Root, data);
+        private int Height(Node node) => node == null ? 0 : node.Height;
 
         private Node Add(Node node, int data) {
 
@@ -46,28 +49,70 @@ namespace AVL {
 
             else node.Right = Add(node.Right, data);
 
-            node.Height = Math.Max(node.Left?.Height ?? 0, node.Right?.Height ?? 0) + 1;
+
+            node.Height = Math.Max(Height(node.Left), Height(node.Right)) + 1;
+
+            var dH = Height(node.Left) - Height(node.Right);
 
 
-            var dH = node.Left?.Height ?? 0 - node.Right?.Height ?? 0;
+            if (dH > 1 && node.Left.Data > data) return RotateLL(node); //5->2->1
 
+            if (dH > 1 && node.Left.Data < data) return RotateLR(node); //5->2->1
 
-            if (dH > 0 && node.Left.Data > data) node = RotateLL(node);
+            if (dH < -1 && node.Right.Data < data) return RotateRR(node); //15->25->40
+
+            if (dH < -1 && node.Right.Data > data) return RotateRL(node); //15->25->17
+
 
             return node;
         }
 
-        private Node RotateLL(Node node) {
-            var new_node = node.Left;
-            node.Left = new_node.Right;
-            new_node.Right = node;
+        private Node RotateLR(Node node) {
+            var root = RotateRR(node.Left);
+            node.Left = root;
+            root = RotateLL(node);
+            return root;
+        }
 
-            node.Height = (node.Left == node.Right && node.Right == null) ? 0 : Math.Max(node.Left?.Height ?? 0, node.Right?.Height ?? 0) + 1;
-            new_node.Height = Math.Max(new_node.Left.Height, new_node.Right.Height) + 1;
-            return new_node;
+        private Node RotateRL(Node node) {
+            var root = RotateLL(node.Right);
+            node.Right = root;
+            root = RotateRR(node);
+            return root;
+        }
+
+        private Node RotateRR(Node node) {
+            var root = node.Right;
+            var leftRooot = root.Left;
+            node.Right = leftRooot;
+            root.Left = node;
+
+            node.Height = Math.Max(Height(node.Left), Height(node.Right)) + 1;
+            root.Height = Math.Max(Height(root.Left), Height(root.Right)) + 1;
+
+            return root;
+        }
+
+        private Node RotateLL(Node node) {
+            var root = node.Left;
+            node.Left = root.Right;
+            root.Right = node;
+
+            node.Height = Math.Max(Height(node.Left), Height(node.Right)) + 1;
+            root.Height = Math.Max(Height(root.Left), Height(root.Right)) + 1;
+            return root;
         }
 
         public void Print() => Print(Root);
+
+        public void PrePrint() => PrePrint(Root);
+
+        private void PrePrint(Node node) {
+            if (node == null) return;
+            Console.WriteLine(node.Data + ":" + node.Height);
+            PrePrint(node.Left);
+            PrePrint(node.Right);
+        }
 
         private void Print(Node root) {
             if (root == null) return;
