@@ -19,20 +19,6 @@ namespace AVL {
         }
     }
 
-    class Node {
-        public Node(int data, Node left = null, Node right = null, int height = 1) {
-            Data = data;
-            Left = left;
-            Right = right;
-            Height = height;
-        }
-
-        public int Data { get; set; }
-        public Node Left { get; set; }
-        public Node Right { get; set; }
-        public int Height { get; set; }
-    }
-
 
     class AVLTree {
 
@@ -55,33 +41,33 @@ namespace AVL {
             var dH = Height(node.Left) - Height(node.Right);
 
 
-            if (dH > 1 && node.Left.Data > data) return RotateLL(node); //5->2->1
+            if (dH > 1 && node.Left.Data > data) return CaseLL(node); //5->2->1
 
-            if (dH > 1 && node.Left.Data < data) return RotateLR(node); //5->2->1
+            if (dH > 1 && node.Left.Data < data) return CaseLR(node); //5->2->1
 
-            if (dH < -1 && node.Right.Data < data) return RotateRR(node); //15->25->40
+            if (dH < -1 && node.Right.Data < data) return CaseRR(node); //15->25->40
 
-            if (dH < -1 && node.Right.Data > data) return RotateRL(node); //15->25->17
+            if (dH < -1 && node.Right.Data > data) return CaseRL(node); //15->25->17
 
 
             return node;
         }
 
-        private Node RotateLR(Node node) {
-            var root = RotateRR(node.Left);
+        private Node CaseLR(Node node) {
+            var root = CaseRR(node.Left);
             node.Left = root;
-            root = RotateLL(node);
+            root = CaseLL(node);
             return root;
         }
 
-        private Node RotateRL(Node node) {
-            var root = RotateLL(node.Right);
+        private Node CaseRL(Node node) {
+            var root = CaseLL(node.Right);
             node.Right = root;
-            root = RotateRR(node);
+            root = CaseRR(node);
             return root;
         }
 
-        private Node RotateRR(Node node) {
+        private Node CaseRR(Node node) {
             var root = node.Right;
             var leftRooot = root.Left;
             node.Right = leftRooot;
@@ -93,7 +79,7 @@ namespace AVL {
             return root;
         }
 
-        private Node RotateLL(Node node) {
+        private Node CaseLL(Node node) {
             var root = node.Left;
             node.Left = root.Right;
             root.Right = node;
